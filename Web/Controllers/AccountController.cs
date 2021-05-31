@@ -255,10 +255,15 @@ namespace QueryTree.Controllers
         // GET: /Account/ResetPassword
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ResetPassword(string code = null)
+        public IActionResult ResetPassword(string code = null, string userId = null)
         {
+            
+            //Console.WriteLine("ResetPassword2: code=" + code + " userId=" + userId);
+            //ApplicationUser u = await _userManager.FindByIdAsync(userId);
             return code == null ? View("Error") : View();
+            
         }
+
 
         //
         // POST: /Account/ResetPassword

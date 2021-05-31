@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using QueryTree.Models;
 using QueryTree.Managers;
 using QueryTree.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace QueryTree
 {
@@ -32,6 +33,11 @@ namespace QueryTree
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
             services.AddSingleton<IConfiguration>(Configuration);
 
             services.Configure<CustomizationConfiguration>(Configuration.GetSection("Customization"));
@@ -101,15 +107,17 @@ namespace QueryTree
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseForwardedHeaders();
                 app.UseDatabaseErrorPage();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseForwardedHeaders();
             }
 
             app.UseStaticFiles();
-
+            app.UseHttpsRedirection();
             app.UseAuthentication();
 
             if (Configuration["RunHangfire"] == "true")
